@@ -332,7 +332,7 @@ async function doLogin() {
   var u = g('li-user').value.trim();
   var p = g('li-pass').value.trim();
   if (!u || !p) { showAuthErr('Please fill in both fields.'); return; }
-  var r = await api('/api/v1/auth/login', { method: 'POST', body: JSON.stringify({ username: u, password: p }) });
+  var r = await api('/api/v1/auth/login', { me0thod: 'POST', body: JSON.stringify({ username: u, password: p }) });
   if (r.ok && r.data && r.data.token) {
     TOKEN = r.data.token; USERNAME = u;
     localStorage.setItem('qm_jwt', TOKEN);
@@ -435,6 +435,11 @@ async function doCompare() {
   var v1=g('c1val').value, t1=g('c1type').value, u1=g('c1unit').value;
   var v2=g('c2val').value, t2=g('c2type').value, u2=g('c2unit').value;
   if (!v1||!u1||!v2||!u2) { toast('Please fill in all fields.'); return; }
+  if (t1 !== t2) {
+    setResult('cmpResult', errCard('Measurement types must match for comparison.'));
+    toast('Please select the same measurement type for both quantities.');
+    return;
+  }
   spin('cmpSpin', true);
   var r = await api('/api/v1/quantities/compare', {
     method: 'POST',
@@ -478,6 +483,11 @@ async function doArithmetic() {
   var v1=g('a1val').value, t1=g('a1type').value, u1=g('a1unit').value;
   var v2=g('a2val').value, t2=g('a2type').value, u2=g('a2unit').value;
   if (!v1||!u1||!v2||!u2) { toast('Please fill in all fields.'); return; }
+  if (t1 !== t2) {
+    setResult('arResult', errCard('Measurement types must match for arithmetic operations.'));
+    toast('Please select the same measurement type for both quantities.');
+    return;
+  }
   spin('arSpin', true);
   var r = await api('/api/v1/quantities/' + currentOp, {
     method: 'POST',

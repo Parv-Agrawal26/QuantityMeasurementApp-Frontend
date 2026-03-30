@@ -1,594 +1,1200 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Quantity Measurement</title>
-  <link rel="stylesheet" href="style.css"/>
-</head>
-<body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Quantity Measurement</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div id="toasts"></div>
 
-<div id="toasts"></div>
+    <!-- ═══════════════ AUTH ═══════════════ -->
+    <div id="authScreen">
+      <div class="auth-card">
+        <h2>⚖️ Quantity Measurement</h2>
+        <p>Sign in to start measuring &amp; converting</p>
 
-<!-- ═══════════════ AUTH ═══════════════ -->
-<div id="authScreen">
-  <div class="auth-card">
-    <h2>⚖️ Quantity Measurement</h2>
-    <p>Sign in to start measuring &amp; converting</p>
+        <div class="auth-tabs">
+          <button
+            class="auth-tab active"
+            id="tab-login"
+            onclick="authTab('login')"
+          >
+            Sign In
+          </button>
+          <button class="auth-tab" id="tab-reg" onclick="authTab('reg')">
+            Create Account
+          </button>
+        </div>
 
-    <div class="auth-tabs">
-      <button class="auth-tab active" id="tab-login" onclick="authTab('login')">Sign In</button>
-      <button class="auth-tab" id="tab-reg" onclick="authTab('reg')">Create Account</button>
-    </div>
+        <div id="authErr" class="auth-error"></div>
 
-    <div id="authErr" class="auth-error"></div>
-
-    <!-- Login -->
-    <div id="form-login">
-      <div class="form-group">
-        <label for="li-user">Username</label>
-        <input type="text" id="li-user" placeholder="Enter username"/>
-      </div>
-      <div class="form-group">
-        <label for="li-pass">Password</label>
-        <input type="password" id="li-pass" placeholder="Enter password"/>
-      </div>
-      <button class="btn btn-primary" style="width:100%" onclick="doLogin()">Sign In</button>
-    </div>
-
-    <!-- Register -->
-    <div id="form-reg" style="display:none">
-      <div class="form-group">
-        <label for="rg-user">Username</label>
-        <input type="text" id="rg-user" placeholder="Choose a username"/>
-      </div>
-      <div class="form-group">
-        <label for="rg-pass">Password</label>
-        <input type="password" id="rg-pass" placeholder="Choose a password"/>
-      </div>
-      <button class="btn btn-primary" style="width:100%" onclick="doRegister()">Create Account</button>
-    </div>
-  </div>
-</div>
-
-<!-- ═══════════════ APP ═══════════════ -->
-<div id="app">
-
-  <nav id="sidebar">
-    <div class="sb-brand">⚖️ QM App</div>
-
-    <div class="sb-section">Operations</div>
-    <button class="sb-link active" onclick="goto('compare')">Compare</button>
-    <button class="sb-link" onclick="goto('convert')">Convert</button>
-    <button class="sb-link" onclick="goto('arithmetic')">Arithmetic</button>
-
-    <div class="sb-section">Data</div>
-    <button class="sb-link" onclick="goto('history')">History (<span id="histCount">0</span>)</button>
-    <button class="sb-link" onclick="goto('stats')">Statistics</button>
-
-    <div class="sb-user">
-      <strong id="sbUsername">User</strong>
-      <button class="sb-logout" onclick="doLogout()">Logout</button>
-    </div>
-  </nav>
-
-  <div id="topbar">
-    <span class="topbar-title" id="topTitle">Compare</span>
-    <div class="server-input-wrap">
-      Server:
-      <input id="serverInput" type="text" value="http://localhost:8080" placeholder="http://localhost:8080"/>
-    </div>
-  </div>
-
-  <div id="main">
-
-    <!-- ── COMPARE ── -->
-    <div class="page active" id="page-compare">
-      <div class="section-head">
-        <h2>Compare Quantities</h2>
-        <p>Check whether two quantities are equal when converted to the same base unit</p>
-      </div>
-      <div class="row-2">
-        <div class="card">
-          <h3>Quantity A</h3>
-          <div class="mb-field"><label class="field-label">Value</label><input type="number" class="field-input" id="c1val" placeholder="e.g. 1"/></div>
-          <div class="mb-field">
-            <label class="field-label">Measurement Type</label>
-            <select class="field-select" id="c1type" onchange="fillUnits('c1type','c1unit')">
-              <option value="">Select type…</option>
-              <option>LENGTH</option><option>WEIGHT</option><option>VOLUME</option><option>TEMPERATURE</option>
-            </select>
+        <!-- Login -->
+        <div id="form-login">
+          <div class="form-group">
+            <label for="li-email">Email</label>
+            <input type="email" id="li-email" placeholder="Enter email" />
           </div>
-          <div class="mb-field"><label class="field-label">Unit</label><select class="field-select" id="c1unit"><option value="">Select unit…</option></select></div>
-        </div>
-        <div class="card">
-          <h3>Quantity B</h3>
-          <div class="mb-field"><label class="field-label">Value</label><input type="number" class="field-input" id="c2val" placeholder="e.g. 12"/></div>
-          <div class="mb-field">
-            <label class="field-label">Measurement Type</label>
-            <select class="field-select" id="c2type" onchange="fillUnits('c2type','c2unit')">
-              <option value="">Select type…</option>
-              <option>LENGTH</option><option>WEIGHT</option><option>VOLUME</option><option>TEMPERATURE</option>
-            </select>
+          <div class="form-group">
+            <label for="li-pass">Password</label>
+            <input type="password" id="li-pass" placeholder="Enter password" />
           </div>
-          <div class="mb-field"><label class="field-label">Unit</label><select class="field-select" id="c2unit"><option value="">Select unit…</option></select></div>
+          <button
+            class="btn btn-primary"
+            style="width: 100%"
+            onclick="doLogin()"
+          >
+            Sign In
+          </button>
+          <button
+            class="btn btn-secondary"
+            style="width: 100%; margin-top: 8px"
+            onclick="oauthLogin()"
+          >
+            Continue with Google
+          </button>
         </div>
-      </div>
-      <div class="btn-row">
-        <button class="btn btn-primary" onclick="doCompare()">Compare</button>
-        <button class="btn btn-secondary" onclick="resetPage('compare')">Reset</button>
-      </div>
-      <p class="spinner" id="cmpSpin">Comparing…</p>
-      <div class="result-area" id="cmpResult"><p class="result-empty">Fill both quantities and click Compare.</p></div>
-    </div>
 
-    <!-- ── CONVERT ── -->
-    <div class="page" id="page-convert">
-      <div class="section-head">
-        <h2>Convert Units</h2>
-        <p>Convert a value from one unit to another within the same measurement type</p>
-      </div>
-      <div class="card">
-        <div class="row-3">
-          <div class="mb-field">
-            <label class="field-label">Measurement Type</label>
-            <select class="field-select" id="cvtype" onchange="fillUnits('cvtype','cvfrom');fillUnits('cvtype','cvto')">
-              <option value="">Select type…</option>
-              <option>LENGTH</option><option>WEIGHT</option><option>VOLUME</option><option>TEMPERATURE</option>
-            </select>
+        <!-- Register -->
+        <div id="form-reg" style="display: none">
+          <div class="form-group">
+            <label for="rg-email">Email</label>
+            <input type="email" id="rg-email" placeholder="Enter email" />
           </div>
-          <div class="mb-field"><label class="field-label">From Unit</label><select class="field-select" id="cvfrom"><option value="">Select unit…</option></select></div>
-          <div class="mb-field"><label class="field-label">To Unit</label><select class="field-select" id="cvto"><option value="">Select unit…</option></select></div>
-        </div>
-        <hr/>
-        <div style="max-width:280px">
-          <label class="field-label">Value to Convert</label>
-          <input type="number" class="field-input" id="cvval" placeholder="e.g. 100"/>
-        </div>
-      </div>
-      <div class="btn-row">
-        <button class="btn btn-primary" onclick="doConvert()">Convert</button>
-        <button class="btn btn-secondary" onclick="resetPage('convert')">Reset</button>
-      </div>
-      <p class="spinner" id="cvSpin">Converting…</p>
-      <div class="result-area" id="cvResult"><p class="result-empty">Select type, units and enter a value to convert.</p></div>
-    </div>
-
-    <!-- ── ARITHMETIC ── -->
-    <div class="page" id="page-arithmetic">
-      <div class="section-head">
-        <h2>Arithmetic Operations</h2>
-        <p>Add, subtract or divide two quantities of the same measurement type</p>
-      </div>
-      <div class="card" style="margin-bottom:14px">
-        <label class="field-label">Select Operation</label>
-        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:6px">
-          <button class="op-btn active" data-op="add" onclick="selOp(this)">Add</button>
-          <button class="op-btn" data-op="subtract" onclick="selOp(this)">Subtract</button>
-          <button class="op-btn" data-op="divide" onclick="selOp(this)">Divide</button>
-        </div>
-      </div>
-      <div class="row-2">
-        <div class="card">
-          <h3>Quantity A</h3>
-          <div class="mb-field"><label class="field-label">Value</label><input type="number" class="field-input" id="a1val" placeholder="e.g. 10"/></div>
-          <div class="mb-field">
-            <label class="field-label">Measurement Type</label>
-            <select class="field-select" id="a1type" onchange="fillUnits('a1type','a1unit')">
-              <option value="">Select type…</option>
-              <option>LENGTH</option><option>WEIGHT</option><option>VOLUME</option>
-            </select>
+          <div class="form-group">
+            <label for="rg-pass">Password</label>
+            <input
+              type="password"
+              id="rg-pass"
+              placeholder="Choose a password"
+            />
           </div>
-          <div class="mb-field"><label class="field-label">Unit</label><select class="field-select" id="a1unit"><option value="">Select unit…</option></select></div>
+          <button
+            class="btn btn-primary"
+            style="width: 100%"
+            onclick="doRegister()"
+          >
+            Create Account
+          </button>
         </div>
-        <div class="card">
-          <h3>Quantity B</h3>
-          <div class="mb-field"><label class="field-label">Value</label><input type="number" class="field-input" id="a2val" placeholder="e.g. 5"/></div>
-          <div class="mb-field">
-            <label class="field-label">Measurement Type</label>
-            <select class="field-select" id="a2type" onchange="fillUnits('a2type','a2unit')">
-              <option value="">Select type…</option>
-              <option>LENGTH</option><option>WEIGHT</option><option>VOLUME</option>
-            </select>
+      </div>
+    </div>
+
+    <!-- ═══════════════ APP ═══════════════ -->
+    <div id="app">
+      <nav id="sidebar">
+        <div class="sb-brand">⚖️ QM App</div>
+
+        <div class="sb-section">Operations</div>
+        <button class="sb-link active" onclick="goto('compare')">
+          Compare
+        </button>
+        <button class="sb-link" onclick="goto('convert')">Convert</button>
+        <button class="sb-link" onclick="goto('arithmetic')">Arithmetic</button>
+
+        <div class="sb-section">Data</div>
+        <button class="sb-link" onclick="goto('history')">
+          History (<span id="histCount">0</span>)
+        </button>
+        <button class="sb-link" onclick="goto('stats')">Statistics</button>
+
+        <div class="sb-user">
+          <strong id="sbEmail">User</strong>
+          <button class="sb-logout" onclick="doLogout()">Logout</button>
+        </div>
+      </nav>
+
+      <div id="topbar">
+        <span class="topbar-title" id="topTitle">Compare</span>
+        <div class="server-input-wrap">
+          Server:
+          <input
+            id="serverInput"
+            type="text"
+            value="http://localhost:8080"
+            placeholder="http://localhost:8080"
+          />
+        </div>
+      </div>
+
+      <div id="main">
+        <!-- ── COMPARE ── -->
+        <div class="page active" id="page-compare">
+          <div class="section-head">
+            <h2>Compare Quantities</h2>
+            <p>
+              Check whether two quantities are equal when converted to the same
+              base unit
+            </p>
           </div>
-          <div class="mb-field"><label class="field-label">Unit</label><select class="field-select" id="a2unit"><option value="">Select unit…</option></select></div>
+          <div class="row-2">
+            <div class="card">
+              <h3>Quantity A</h3>
+              <div class="mb-field">
+                <label class="field-label">Value</label
+                ><input
+                  type="number"
+                  class="field-input"
+                  id="c1val"
+                  placeholder="e.g. 1"
+                />
+              </div>
+              <div class="mb-field">
+                <label class="field-label">Measurement Type</label>
+                <select
+                  class="field-select"
+                  id="c1type"
+                  onchange="fillUnits('c1type', 'c1unit')"
+                >
+                  <option value="">Select type…</option>
+                  <option>LENGTH</option>
+                  <option>WEIGHT</option>
+                  <option>VOLUME</option>
+                  <option>TEMPERATURE</option>
+                </select>
+              </div>
+              <div class="mb-field">
+                <label class="field-label">Unit</label
+                ><select class="field-select" id="c1unit">
+                  <option value="">Select unit…</option>
+                </select>
+              </div>
+            </div>
+            <div class="card">
+              <h3>Quantity B</h3>
+              <div class="mb-field">
+                <label class="field-label">Value</label
+                ><input
+                  type="number"
+                  class="field-input"
+                  id="c2val"
+                  placeholder="e.g. 12"
+                />
+              </div>
+              <div class="mb-field">
+                <label class="field-label">Measurement Type</label>
+                <select
+                  class="field-select"
+                  id="c2type"
+                  onchange="fillUnits('c2type', 'c2unit')"
+                >
+                  <option value="">Select type…</option>
+                  <option>LENGTH</option>
+                  <option>WEIGHT</option>
+                  <option>VOLUME</option>
+                  <option>TEMPERATURE</option>
+                </select>
+              </div>
+              <div class="mb-field">
+                <label class="field-label">Unit</label
+                ><select class="field-select" id="c2unit">
+                  <option value="">Select unit…</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="btn-row">
+            <button class="btn btn-primary" onclick="doCompare()">
+              Compare
+            </button>
+            <button class="btn btn-secondary" onclick="resetPage('compare')">
+              Reset
+            </button>
+          </div>
+          <p class="spinner" id="cmpSpin">Comparing…</p>
+          <div class="result-area" id="cmpResult">
+            <p class="result-empty">Fill both quantities and click Compare.</p>
+          </div>
+        </div>
+
+        <!-- ── CONVERT ── -->
+        <div class="page" id="page-convert">
+          <div class="section-head">
+            <h2>Convert Units</h2>
+            <p>
+              Convert a value from one unit to another within the same
+              measurement type
+            </p>
+          </div>
+          <div class="card">
+            <div class="row-3">
+              <div class="mb-field">
+                <label class="field-label">Measurement Type</label>
+                <select
+                  class="field-select"
+                  id="cvtype"
+                  onchange="
+                    fillUnits('cvtype', 'cvfrom');
+                    fillUnits('cvtype', 'cvto');
+                  "
+                >
+                  <option value="">Select type…</option>
+                  <option>LENGTH</option>
+                  <option>WEIGHT</option>
+                  <option>VOLUME</option>
+                  <option>TEMPERATURE</option>
+                </select>
+              </div>
+              <div class="mb-field">
+                <label class="field-label">From Unit</label
+                ><select class="field-select" id="cvfrom">
+                  <option value="">Select unit…</option>
+                </select>
+              </div>
+              <div class="mb-field">
+                <label class="field-label">To Unit</label
+                ><select class="field-select" id="cvto">
+                  <option value="">Select unit…</option>
+                </select>
+              </div>
+            </div>
+            <hr />
+            <div style="max-width: 280px">
+              <label class="field-label">Value to Convert</label>
+              <input
+                type="number"
+                class="field-input"
+                id="cvval"
+                placeholder="e.g. 100"
+              />
+            </div>
+          </div>
+          <div class="btn-row">
+            <button class="btn btn-primary" onclick="doConvert()">
+              Convert
+            </button>
+            <button class="btn btn-secondary" onclick="resetPage('convert')">
+              Reset
+            </button>
+          </div>
+          <p class="spinner" id="cvSpin">Converting…</p>
+          <div class="result-area" id="cvResult">
+            <p class="result-empty">
+              Select type, units and enter a value to convert.
+            </p>
+          </div>
+        </div>
+
+        <!-- ── ARITHMETIC ── -->
+        <div class="page" id="page-arithmetic">
+          <div class="section-head">
+            <h2>Arithmetic Operations</h2>
+            <p>
+              Add, subtract or divide two quantities of the same measurement
+              type
+            </p>
+          </div>
+          <div class="card" style="margin-bottom: 14px">
+            <label class="field-label">Select Operation</label>
+            <div
+              style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 6px"
+            >
+              <button class="op-btn active" data-op="add" onclick="selOp(this)">
+                Add
+              </button>
+              <button class="op-btn" data-op="subtract" onclick="selOp(this)">
+                Subtract
+              </button>
+              <button class="op-btn" data-op="divide" onclick="selOp(this)">
+                Divide
+              </button>
+            </div>
+          </div>
+          <div class="row-2">
+            <div class="card">
+              <h3>Quantity A</h3>
+              <div class="mb-field">
+                <label class="field-label">Value</label
+                ><input
+                  type="number"
+                  class="field-input"
+                  id="a1val"
+                  placeholder="e.g. 10"
+                />
+              </div>
+              <div class="mb-field">
+                <label class="field-label">Measurement Type</label>
+                <select
+                  class="field-select"
+                  id="a1type"
+                  onchange="fillUnits('a1type', 'a1unit')"
+                >
+                  <option value="">Select type…</option>
+                  <option>LENGTH</option>
+                  <option>WEIGHT</option>
+                  <option>VOLUME</option>
+                </select>
+              </div>
+              <div class="mb-field">
+                <label class="field-label">Unit</label
+                ><select class="field-select" id="a1unit">
+                  <option value="">Select unit…</option>
+                </select>
+              </div>
+            </div>
+            <div class="card">
+              <h3>Quantity B</h3>
+              <div class="mb-field">
+                <label class="field-label">Value</label
+                ><input
+                  type="number"
+                  class="field-input"
+                  id="a2val"
+                  placeholder="e.g. 5"
+                />
+              </div>
+              <div class="mb-field">
+                <label class="field-label">Measurement Type</label>
+                <select
+                  class="field-select"
+                  id="a2type"
+                  onchange="fillUnits('a2type', 'a2unit')"
+                >
+                  <option value="">Select type…</option>
+                  <option>LENGTH</option>
+                  <option>WEIGHT</option>
+                  <option>VOLUME</option>
+                </select>
+              </div>
+              <div class="mb-field">
+                <label class="field-label">Unit</label
+                ><select class="field-select" id="a2unit">
+                  <option value="">Select unit…</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="btn-row">
+            <button class="btn btn-primary" onclick="doArithmetic()">
+              Calculate
+            </button>
+            <button class="btn btn-secondary" onclick="resetPage('arithmetic')">
+              Reset
+            </button>
+          </div>
+          <p class="spinner" id="arSpin">Calculating…</p>
+          <div class="result-area" id="arResult">
+            <p class="result-empty">
+              Select an operation, fill both quantities and click Calculate.
+            </p>
+          </div>
+        </div>
+
+        <!-- ── HISTORY ── -->
+        <div class="page" id="page-history">
+          <div class="section-head-row">
+            <div>
+              <h2>Operation History</h2>
+              <p>All operations saved to the database</p>
+            </div>
+            <div
+              style="
+                display: flex;
+                gap: 8px;
+                align-items: center;
+                flex-wrap: wrap;
+              "
+            >
+              <select class="field-select" id="histFilter" style="width: 160px">
+                <option value="">All Operations</option>
+                <option>COMPARE</option>
+                <option>CONVERT</option>
+                <option>ADD</option>
+                <option>SUBTRACT</option>
+                <option>DIVIDE</option>
+              </select>
+              <button class="btn btn-primary" onclick="loadHistory()">
+                Refresh
+              </button>
+            </div>
+          </div>
+          <p class="spinner" id="histSpin">Loading history…</p>
+          <div style="overflow-x: auto">
+            <table class="hist-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Operation</th>
+                  <th>Qty A</th>
+                  <th>Qty B</th>
+                  <th>Result</th>
+                  <th>Status</th>
+                  <th>Time</th>
+                </tr>
+              </thead>
+              <tbody id="histBody">
+                <tr>
+                  <td
+                    colspan="7"
+                    style="padding: 20px; color: #888; text-align: center"
+                  >
+                    Click Refresh to load history
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- ── STATS ── -->
+        <div class="page" id="page-stats">
+          <div class="section-head-row">
+            <div>
+              <h2>Statistics</h2>
+              <p>Successful operation counts by type</p>
+            </div>
+            <button class="btn btn-primary" onclick="loadStats()">
+              Refresh
+            </button>
+          </div>
+          <div class="stat-grid" id="statGrid"></div>
+          <div class="card">
+            <h3>Operation Distribution</h3>
+            <p class="spinner" id="statSpin">Loading…</p>
+            <div class="bar-chart" id="barChart"></div>
+          </div>
         </div>
       </div>
-      <div class="btn-row">
-        <button class="btn btn-primary" onclick="doArithmetic()">Calculate</button>
-        <button class="btn btn-secondary" onclick="resetPage('arithmetic')">Reset</button>
-      </div>
-      <p class="spinner" id="arSpin">Calculating…</p>
-      <div class="result-area" id="arResult"><p class="result-empty">Select an operation, fill both quantities and click Calculate.</p></div>
+      <!-- /main -->
     </div>
+    <!-- /app -->
 
-    <!-- ── HISTORY ── -->
-    <div class="page" id="page-history">
-      <div class="section-head-row">
-        <div>
-          <h2>Operation History</h2>
-          <p>All operations saved to the database</p>
-        </div>
-        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-          <select class="field-select" id="histFilter" style="width:160px">
-            <option value="">All Operations</option>
-            <option>COMPARE</option><option>CONVERT</option><option>ADD</option><option>SUBTRACT</option><option>DIVIDE</option>
-          </select>
-          <button class="btn btn-primary" onclick="loadHistory()">Refresh</button>
-        </div>
-      </div>
-      <p class="spinner" id="histSpin">Loading history…</p>
-      <div style="overflow-x:auto">
-        <table class="hist-table">
-          <thead>
-            <tr><th>ID</th><th>Operation</th><th>Qty A</th><th>Qty B</th><th>Result</th><th>Status</th><th>Time</th></tr>
-          </thead>
-          <tbody id="histBody">
-            <tr><td colspan="7" style="padding:20px;color:#888;text-align:center">Click Refresh to load history</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
+    <script>
+      // ── State ──────────────────────────────────────────────
+      var TOKEN = localStorage.getItem("qm_jwt") || null;
+      var EMAIL = localStorage.getItem("qm_email") || "";
+      var currentOp = "add";
 
-    <!-- ── STATS ── -->
-    <div class="page" id="page-stats">
-      <div class="section-head-row">
-        <div>
-          <h2>Statistics</h2>
-          <p>Successful operation counts by type</p>
-        </div>
-        <button class="btn btn-primary" onclick="loadStats()">Refresh</button>
-      </div>
-      <div class="stat-grid" id="statGrid"></div>
-      <div class="card">
-        <h3>Operation Distribution</h3>
-        <p class="spinner" id="statSpin">Loading…</p>
-        <div class="bar-chart" id="barChart"></div>
-      </div>
-    </div>
+      var UNITS = {
+        LENGTH: ["FEET", "INCHES", "YARDS", "CENTIMETERS"],
+        WEIGHT: ["KILOGRAM", "GRAM", "POUND"],
+        VOLUME: ["LITRE", "MILLILITRE", "GALLON"],
+        TEMPERATURE: ["CELSIUS", "FAHRENHEIT"],
+      };
+      var OPS = ["COMPARE", "CONVERT", "ADD", "SUBTRACT", "DIVIDE"];
 
-  </div><!-- /main -->
-</div><!-- /app -->
+      // ── Boot ───────────────────────────────────────────────
+      window.onload = function () {
+        processOAuthCallback();
+        if (TOKEN) enterApp();
+      };
 
-<script>
-// ── State ──────────────────────────────────────────────
-var TOKEN    = localStorage.getItem('qm_jwt')  || null;
-var USERNAME = localStorage.getItem('qm_user') || '';
-var currentOp = 'add';
+      async function processOAuthCallback() {
+        var params = new URLSearchParams(window.location.search);
+        var oauthError = params.get("error");
+        var oauthToken = params.get("oauth_token") || params.get("token");
+        var oauthEmail = params.get("oauth_email") || params.get("email");
+        var code = params.get("code");
 
-var UNITS = {
-  LENGTH:      ['FEET','INCHES','YARDS','CENTIMETERS'],
-  WEIGHT:      ['KILOGRAM','GRAM','POUND'],
-  VOLUME:      ['LITRE','MILLILITRE','GALLON'],
-  TEMPERATURE: ['CELSIUS','FAHRENHEIT']
-};
-var OPS = ['COMPARE','CONVERT','ADD','SUBTRACT','DIVIDE'];
+        if (oauthError) {
+          showAuthErr("OAuth error: " + oauthError);
+          return;
+        }
 
-// ── Boot ───────────────────────────────────────────────
-window.onload = function() {
-  if (TOKEN) enterApp();
-};
+        if (oauthToken && oauthEmail) {
+          TOKEN = oauthToken;
+          EMAIL = oauthEmail;
+          localStorage.setItem("qm_jwt", TOKEN);
+          localStorage.setItem("qm_email", EMAIL);
+          toast("OAuth login successful, welcome " + EMAIL + "!");
+          window.history.replaceState({}, document.title, window.location.pathname);
+          enterApp();
+          return;
+        }
 
-function enterApp() {
-  g('authScreen').style.display = 'none';
-  g('app').style.display        = 'flex';
-  g('sbUsername').textContent   = USERNAME || 'User';
-  goto('compare');
-  loadHistCount();
-}
+        if (code) {
+          // Spring Security default callback returns ?code=... when user is redirected from Google
+          try {
+            var redirectUri = window.location.origin + window.location.pathname;
+            var r = await api("/api/v1/auth/oauth/callback", {
+              method: "POST",
+              body: JSON.stringify({ code: code, redirectUri: redirectUri }),
+            });
 
-// ── Auth UI ────────────────────────────────────────────
-function authTab(tab) {
-  g('form-login').style.display = tab === 'login' ? '' : 'none';
-  g('form-reg').style.display   = tab === 'reg'   ? '' : 'none';
-  g('tab-login').className = 'auth-tab' + (tab === 'login' ? ' active' : '');
-  g('tab-reg').className   = 'auth-tab' + (tab === 'reg'   ? ' active' : '');
-  g('authErr').className   = 'auth-error';
-  g('authErr').textContent = '';
-}
+            if (r.ok && r.data && r.data.token && r.data.email) {
+              TOKEN = r.data.token;
+              EMAIL = r.data.email;
+              localStorage.setItem("qm_jwt", TOKEN);
+              localStorage.setItem("qm_email", EMAIL);
+              toast("OAuth login successful, welcome " + EMAIL + "!");
+              window.history.replaceState({}, document.title, window.location.pathname);
+              enterApp();
+            } else {
+              showAuthErr(
+                (r.data && r.data.message) ||
+                  "OAuth callback failed (token exchange).",
+              );
+            }
+          } catch (err) {
+            showAuthErr("OAuth callback failed: " + err.message);
+          }
+        }
+      }
 
-function showAuthErr(msg) {
-  g('authErr').textContent = msg;
-  g('authErr').className   = 'auth-error show';
-}
+      function oauthLogin() {
+        var redirectUri = window.location.origin + window.location.pathname;
 
-// ── API ────────────────────────────────────────────────
-function getBase() {
-  return (g('serverInput').value || 'http://localhost:8080').replace(/\/$/, '');
-}
+        // Set to your backend OAuth entrypoint.
+        var oauthPath = "/oauth2/authorization/google";
 
-async function api(path, opts) {
-  opts = opts || {};
-  var headers = { 'Content-Type': 'application/json' };
-  if (TOKEN) headers['Authorization'] = 'Bearer ' + TOKEN;
-  try {
-    var res  = await fetch(getBase() + path, Object.assign({}, opts, { headers: headers }));
-    var data = null;
-    try { data = await res.json(); } catch(e) {}
-    return { ok: res.ok, data: data };
-  } catch(e) {
-    return { ok: false, data: null };
-  }
-}
+        // If you have a custom entrypoint, switch this:
+        // oauthPath = "/api/v1/auth/oauth/google";
 
-// ── Register / Login / Logout ──────────────────────────
-async function doRegister() {
-  var u = g('rg-user').value.trim();
-  var p = g('rg-pass').value.trim();
-  if (!u || !p) { showAuthErr('Please fill in both fields.'); return; }
-  var r = await api('/api/v1/auth/register', { method: 'POST', body: JSON.stringify({ username: u, password: p }) });
-  if (r.ok && r.data && r.data.token) {
-    TOKEN = r.data.token; USERNAME = u;
-    localStorage.setItem('qm_jwt', TOKEN);
-    localStorage.setItem('qm_user', USERNAME);
-    toast('Account created! Welcome, ' + u);
-    enterApp();
-  } else {
-    showAuthErr((r.data && r.data.message) || 'Registration failed. Username may already exist.');
-  }
-}
+        var url = getBase() + oauthPath + "?redirect_uri=" + encodeURIComponent(redirectUri);
 
-async function doLogin() {
-  var u = g('li-user').value.trim();
-  var p = g('li-pass').value.trim();
-  if (!u || !p) { showAuthErr('Please fill in both fields.'); return; }
-  var r = await api('/api/v1/auth/login', { me0thod: 'POST', body: JSON.stringify({ username: u, password: p }) });
-  if (r.ok && r.data && r.data.token) {
-    TOKEN = r.data.token; USERNAME = u;
-    localStorage.setItem('qm_jwt', TOKEN);
-    localStorage.setItem('qm_user', USERNAME);
-    toast('Welcome back, ' + u + '!');
-    enterApp();
-  } else {
-    showAuthErr((r.data && r.data.message) || 'Invalid username or password.');
-  }
-}
+        var popup = window.open(url, "oauthPopup", "width=600,height=700");
+        if (!popup) {
+          showAuthErr("Popup blocked. Please allow popups for this site.");
+          return;
+        }
 
-async function doLogout() {
-  await api('/api/v1/auth/logout', { method: 'POST' });
-  TOKEN = null; USERNAME = '';
-  localStorage.removeItem('qm_jwt');
-  localStorage.removeItem('qm_user');
-  g('app').style.display        = 'none';
-  g('authScreen').style.display = '';
-  g('li-user').value = '';
-  g('li-pass').value = '';
-  authTab('login');
-  toast('Logged out.');
-}
+        var poll = window.setInterval(async function () {
+          if (popup.closed) {
+            window.clearInterval(poll);
+            showAuthErr("OAuth popup was closed before sign-in completed.");
+            return;
+          }
 
-// ── Navigation ─────────────────────────────────────────
-var TITLES = { compare:'Compare', convert:'Convert', arithmetic:'Arithmetic', history:'History', stats:'Statistics' };
+          try {
+            // If same-origin path reached and backend returned JSON token body
+            var bodyText = (popup.document.body && popup.document.body.textContent) || "";
+            var trimmed = bodyText.trim();
 
-function goto(name) {
-  document.querySelectorAll('.page').forEach(function(p) { p.classList.remove('active'); });
-  g('page-' + name).classList.add('active');
-  document.querySelectorAll('.sb-link').forEach(function(b) {
-    b.classList.toggle('active', b.getAttribute('onclick') && b.getAttribute('onclick').includes("'" + name + "'"));
-  });
-  g('topTitle').textContent = TITLES[name] || name;
-  if (name === 'stats')   loadStats();
-  if (name === 'history') loadHistory();
-}
+            if (trimmed.startsWith("{")) {
+              var tokenJson = JSON.parse(trimmed);
+              if (tokenJson.token) {
+                window.clearInterval(poll);
+                popup.close();
 
-// ── Unit dropdowns ─────────────────────────────────────
-function fillUnits(typeId, unitId) {
-  var type = g(typeId).value;
-  var sel  = g(unitId);
-  sel.innerHTML = '<option value="">Select unit…</option>';
-  (UNITS[type] || []).forEach(function(u) {
-    var opt = document.createElement('option');
-    opt.textContent = u;
-    sel.appendChild(opt);
-  });
-}
+                var token = tokenJson.token;
+                var email = tokenJson.email || (parseJwt(token).sub || "");
 
-// ── Spinner ────────────────────────────────────────────
-function spin(id, on) { g(id).className = 'spinner' + (on ? ' show' : ''); }
+                if (!email) {
+                  showAuthErr("OAuth token received, but email is missing.");
+                  return;
+                }
 
-// ── Result helpers ─────────────────────────────────────
-function errCard(msg) {
-  return '<div class="result-error"><strong>Error:</strong> ' + esc(msg) + '</div>';
-}
+                TOKEN = token;
+                EMAIL = email;
+                localStorage.setItem("qm_jwt", TOKEN);
+                localStorage.setItem("qm_email", EMAIL);
+                toast("OAuth login successful, welcome " + EMAIL + "!");
+                enterApp();
+                return;
+              }
+            }
 
-function metaRow(items) {
-  var html = '<div class="result-meta">';
-  items.forEach(function(it) {
-    html += '<div class="meta-box"><div class="mk">' + esc(it[0]) + '</div><div class="mv">' + esc(String(it[1])) + '</div></div>';
-  });
-  return html + '</div>';
-}
+            // If callback with code from backend to frontend
+            var currentUrl = popup.location.href;
+            var callbackParams = new URLSearchParams(new URL(currentUrl).search);
+            if (callbackParams.has("token") && callbackParams.has("email")) {
+              window.clearInterval(poll);
+              popup.close();
 
-function renderCompare(d) {
-  if (d.error) return errCard(d.errorMessage || 'Unknown error');
-  var isEq = d.resultString === 'true';
-  return '<div class="result-success">'
-    + '<div class="result-label">Comparison Result</div>'
-    + '<div class="result-value">' + (isEq ? '✓ EQUAL' : '✗ NOT EQUAL') + '</div>'
-    + metaRow([['Qty A', d.thisValue + ' ' + d.thisUnit], ['Qty B', d.thatValue + ' ' + d.thatUnit], ['Type', d.thisMeasurementType || '—'], ['Record #', d.id]])
-    + '</div>';
-}
+              TOKEN = callbackParams.get("token");
+              EMAIL = callbackParams.get("email");
+              localStorage.setItem("qm_jwt", TOKEN);
+              localStorage.setItem("qm_email", EMAIL);
+              toast("OAuth login successful, welcome " + EMAIL + "!");
+              enterApp();
+              return;
+            }
+          } catch (e) {
+            // Cross-origin navigation occurs before final callback; ignore security exceptions.
+          }
+        }, 500);
+      }
 
-function renderConvert(d) {
-  if (d.error) return errCard(d.errorMessage || 'Unknown error');
-  return '<div class="result-success">'
-    + '<div class="result-label">Conversion Result</div>'
-    + '<div class="result-value">' + fmt(d.resultValue) + ' ' + esc(d.resultUnit) + '</div>'
-    + metaRow([['Original', d.thisValue + ' ' + d.thisUnit], ['Converted', fmt(d.resultValue) + ' ' + d.resultUnit], ['Type', d.thisMeasurementType || '—'], ['Record #', d.id]])
-    + '</div>';
-}
+      function parseJwt(token) {
+        if (!token) return {};
+        var base64Url = token.split(".")[1];
+        if (!base64Url) return {};
+        var base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+        try {
+          var jsonPayload = decodeURIComponent(
+            atob(base64)
+              .split("")
+              .map(function (c) {
+                return "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2);
+              })
+              .join("")
+          );
+          return JSON.parse(jsonPayload);
+        } catch (err) {
+          return {};
+        }
+      }
 
-function renderArithmetic(d, op) {
-  if (d.error) return errCard(d.errorMessage || 'Unknown error');
-  var labels = { add: 'Addition', subtract: 'Subtraction', divide: 'Division' };
-  return '<div class="result-success">'
-    + '<div class="result-label">' + (labels[op] || op) + ' Result</div>'
-    + '<div class="result-value">' + fmt(d.resultValue) + ' ' + esc(d.resultUnit || '') + '</div>'
-    + metaRow([['Qty A', d.thisValue + ' ' + d.thisUnit], ['Qty B', d.thatValue + ' ' + d.thatUnit], ['Operation', labels[op] || op], ['Record #', d.id]])
-    + '</div>';
-}
+      function enterApp() {
+        g("authScreen").style.display = "none";
+        g("app").style.display = "flex";
+        g("sbEmail").textContent = EMAIL || "User";
+        goto("compare");
+        loadHistCount();
+      }
 
-function setResult(id, html) { g(id).innerHTML = html; }
+      // ── Auth UI ────────────────────────────────────────────
+      function authTab(tab) {
+        g("form-login").style.display = tab === "login" ? "" : "none";
+        g("form-reg").style.display = tab === "reg" ? "" : "none";
+        g("tab-login").className =
+          "auth-tab" + (tab === "login" ? " active" : "");
+        g("tab-reg").className = "auth-tab" + (tab === "reg" ? " active" : "");
+        g("authErr").className = "auth-error";
+        g("authErr").textContent = "";
+      }
 
-// ── Compare ────────────────────────────────────────────
-async function doCompare() {
-  var v1=g('c1val').value, t1=g('c1type').value, u1=g('c1unit').value;
-  var v2=g('c2val').value, t2=g('c2type').value, u2=g('c2unit').value;
-  if (!v1||!u1||!v2||!u2) { toast('Please fill in all fields.'); return; }
-  if (t1 !== t2) {
-    setResult('cmpResult', errCard('Measurement types must match for comparison.'));
-    toast('Please select the same measurement type for both quantities.');
-    return;
-  }
-  spin('cmpSpin', true);
-  var r = await api('/api/v1/quantities/compare', {
-    method: 'POST',
-    body: JSON.stringify({
-      thisQuantityDTO: { value: +v1, unit: u1, measurementType: t1 },
-      thatQuantityDTO: { value: +v2, unit: u2, measurementType: t2 }
-    })
-  });
-  spin('cmpSpin', false);
-  if (!r.ok || !r.data) { setResult('cmpResult', errCard('Could not reach the server.')); return; }
-  setResult('cmpResult', renderCompare(r.data));
-  if (!r.data.error) { toast('Comparison complete!'); loadHistCount(); }
-}
+      function showAuthErr(msg) {
+        g("authErr").textContent = msg;
+        g("authErr").className = "auth-error show";
+      }
 
-// ── Convert ────────────────────────────────────────────
-async function doConvert() {
-  var type=g('cvtype').value, from=g('cvfrom').value, to=g('cvto').value, val=g('cvval').value;
-  if (!type||!from||!to||!val) { toast('Please fill in all fields.'); return; }
-  spin('cvSpin', true);
-  var r = await api('/api/v1/quantities/convert', {
-    method: 'POST',
-    body: JSON.stringify({
-      thisQuantityDTO: { value: +val, unit: from, measurementType: type },
-      thatQuantityDTO: { value: 0,    unit: to,   measurementType: type }
-    })
-  });
-  spin('cvSpin', false);
-  if (!r.ok || !r.data) { setResult('cvResult', errCard('Could not reach the server.')); return; }
-  setResult('cvResult', renderConvert(r.data));
-  if (!r.data.error) { toast('Conversion complete!'); loadHistCount(); }
-}
+      // ── API ────────────────────────────────────────────────
+      function getBase() {
+        return (g("serverInput").value || "http://localhost:8080").replace(
+          /\/$/,
+          "",
+        );
+      }
 
-// ── Arithmetic ─────────────────────────────────────────
-function selOp(btn) {
-  document.querySelectorAll('.op-btn').forEach(function(b) { b.classList.remove('active'); });
-  btn.classList.add('active');
-  currentOp = btn.dataset.op;
-}
+      async function api(path, opts) {
+        opts = opts || {};
+        var headers = { "Content-Type": "application/json" };
+        if (TOKEN) headers["Authorization"] = "Bearer " + TOKEN;
+        try {
+          var res = await fetch(
+            getBase() + path,
+            Object.assign({}, opts, { headers: headers }),
+          );
+          var data = null;
+          try {
+            data = await res.json();
+          } catch (e) {}
+          return { ok: res.ok, data: data };
+        } catch (e) {
+          return { ok: false, data: null };
+        }
+      }
 
-async function doArithmetic() {
-  var v1=g('a1val').value, t1=g('a1type').value, u1=g('a1unit').value;
-  var v2=g('a2val').value, t2=g('a2type').value, u2=g('a2unit').value;
-  if (!v1||!u1||!v2||!u2) { toast('Please fill in all fields.'); return; }
-  if (t1 !== t2) {
-    setResult('arResult', errCard('Measurement types must match for arithmetic operations.'));
-    toast('Please select the same measurement type for both quantities.');
-    return;
-  }
-  spin('arSpin', true);
-  var r = await api('/api/v1/quantities/' + currentOp, {
-    method: 'POST',
-    body: JSON.stringify({
-      thisQuantityDTO: { value: +v1, unit: u1, measurementType: t1 },
-      thatQuantityDTO: { value: +v2, unit: u2, measurementType: t2 }
-    })
-  });
-  spin('arSpin', false);
-  if (!r.ok || !r.data) { setResult('arResult', errCard('Could not reach the server.')); return; }
-  setResult('arResult', renderArithmetic(r.data, currentOp));
-  if (!r.data.error) { toast('Calculation complete!'); loadHistCount(); }
-}
+      // ── Register / Login / Logout ──────────────────────────
+      async function doRegister() {
+        var e = g("rg-email").value.trim();
+        var p = g("rg-pass").value.trim();
+        if (!e || !p) {
+          showAuthErr("Please fill in both fields.");
+          return;
+        }
+        var r = await api("/api/v1/auth/register", {
+          method: "POST",
+          body: JSON.stringify({ email: e, password: p }),
+        });
+        if (r.ok && r.data && r.data.token) {
+          TOKEN = r.data.token;
+          EMAIL = e;
+          localStorage.setItem("qm_jwt", TOKEN);
+          localStorage.setItem("qm_email", EMAIL);
+          toast("Account created! Welcome, " + e);
+          enterApp();
+        } else {
+          showAuthErr(
+            (r.data && r.data.message) ||
+              "Registration failed. Email may already exist.",
+          );
+        }
+      }
 
-// ── Reset ──────────────────────────────────────────────
-var RESETS = {
-  compare:    { inputs:['c1val','c2val'], selects:['c1type','c1unit','c2type','c2unit'], result:'cmpResult', msg:'Fill both quantities and click Compare.' },
-  convert:    { inputs:['cvval'],         selects:['cvtype','cvfrom','cvto'],            result:'cvResult',  msg:'Select type, units and enter a value to convert.' },
-  arithmetic: { inputs:['a1val','a2val'], selects:['a1type','a1unit','a2type','a2unit'], result:'arResult',  msg:'Select an operation, fill both quantities and click Calculate.' }
-};
+      async function doLogin() {
+        var e = g("li-email").value.trim();
+        var p = g("li-pass").value.trim();
+        if (!e || !p) {
+          showAuthErr("Please fill in both fields.");
+          return;
+        }
+        var r = await api("/api/v1/auth/login", {
+          method: "POST",
+          body: JSON.stringify({ email: e, password: p }),
+        });
+        if (r.ok && r.data && r.data.token) {
+          TOKEN = r.data.token;
+          EMAIL = e;
+          localStorage.setItem("qm_jwt", TOKEN);
+          localStorage.setItem("qm_email", EMAIL);
+          toast("Welcome back, " + e + "!");
+          enterApp();
+        } else {
+          showAuthErr(
+            (r.data && r.data.message) || "Invalid email or password.",
+          );
+        }
+      }
 
-function resetPage(name) {
-  var cfg = RESETS[name];
-  if (!cfg) return;
-  cfg.inputs.forEach(function(id)   { if (g(id)) g(id).value = ''; });
-  cfg.selects.forEach(function(id)  { if (g(id)) g(id).innerHTML = '<option value="">Select…</option>'; });
-  g(cfg.result).innerHTML = '<p class="result-empty">' + cfg.msg + '</p>';
-}
+      async function doLogout() {
+        await api("/api/v1/auth/logout", { method: "POST" });
+        TOKEN = null;
+        EMAIL = "";
+        localStorage.removeItem("qm_jwt");
+        localStorage.removeItem("qm_email");
+        g("app").style.display = "none";
+        g("authScreen").style.display = "";
+        g("li-email").value = "";
+        g("li-pass").value = "";
+        authTab("login");
+        toast("Logged out.");
+      }
 
-// ── History ────────────────────────────────────────────
-async function loadHistory() {
-  var op   = g('histFilter').value;
-  var path = op ? '/api/v1/quantities/history/' + op : '/api/v1/quantities/history';
-  spin('histSpin', true);
-  var r = await api(path);
-  spin('histSpin', false);
-  if (!r.ok || !Array.isArray(r.data)) { toast('Failed to load history.'); return; }
-  g('histCount').textContent = r.data.length;
-  var body = g('histBody');
-  if (!r.data.length) {
-    body.innerHTML = '<tr><td colspan="7" style="padding:20px;color:#888;text-align:center">No records found</td></tr>';
-    return;
-  }
-  body.innerHTML = r.data.map(function(row) {
-    var qA  = row.thisValue != null ? row.thisValue + ' ' + (row.thisUnit || '') : '—';
-    var qB  = row.thatValue != null ? row.thatValue + ' ' + (row.thatUnit || '') : '—';
-    var res, status;
-    if (row.error) {
-      res    = '<span style="color:#c00">' + esc(row.errorMessage || 'Error') + '</span>';
-      status = '<span style="color:#c00">Error</span>';
-    } else if (row.operation === 'COMPARE') {
-      var eq = row.resultString === 'true';
-      res    = '<strong style="color:' + (eq ? 'green' : 'red') + '">' + (eq ? 'Equal' : 'Not Equal') + '</strong>';
-      status = '<span style="color:green">OK</span>';
-    } else {
-      res    = '<strong>' + fmt(row.resultValue) + ' ' + esc(row.resultUnit || '') + '</strong>';
-      status = '<span style="color:green">OK</span>';
-    }
-    var ts = row.createdAt ? new Date(row.createdAt).toLocaleString() : '—';
-    return '<tr><td>' + esc(String(row.id)) + '</td><td>' + esc(row.operation || '—') + '</td><td>' + esc(qA) + '</td><td>' + esc(qB) + '</td><td>' + res + '</td><td>' + status + '</td><td>' + ts + '</td></tr>';
-  }).join('');
-}
+      // ── Navigation ─────────────────────────────────────────
+      var TITLES = {
+        compare: "Compare",
+        convert: "Convert",
+        arithmetic: "Arithmetic",
+        history: "History",
+        stats: "Statistics",
+      };
 
-async function loadHistCount() {
-  var r = await api('/api/v1/quantities/history');
-  if (r.ok && Array.isArray(r.data)) g('histCount').textContent = r.data.length;
-}
+      function goto(name) {
+        document.querySelectorAll(".page").forEach(function (p) {
+          p.classList.remove("active");
+        });
+        g("page-" + name).classList.add("active");
+        document.querySelectorAll(".sb-link").forEach(function (b) {
+          b.classList.toggle(
+            "active",
+            b.getAttribute("onclick") &&
+              b.getAttribute("onclick").includes("'" + name + "'"),
+          );
+        });
+        g("topTitle").textContent = TITLES[name] || name;
+        if (name === "stats") loadStats();
+        if (name === "history") loadHistory();
+      }
 
-// ── Stats ──────────────────────────────────────────────
-async function loadStats() {
-  spin('statSpin', true);
-  var results = await Promise.all(OPS.map(function(op) { return api('/api/v1/quantities/count/' + op); }));
-  spin('statSpin', false);
-  var counts = {};
-  OPS.forEach(function(op, i) { counts[op] = results[i].ok ? (results[i].data || 0) : 0; });
-  var total = OPS.reduce(function(s, op) { return s + counts[op]; }, 0);
+      // ── Unit dropdowns ─────────────────────────────────────
+      function fillUnits(typeId, unitId) {
+        var type = g(typeId).value;
+        var sel = g(unitId);
+        sel.innerHTML = '<option value="">Select unit…</option>';
+        (UNITS[type] || []).forEach(function (u) {
+          var opt = document.createElement("option");
+          opt.textContent = u;
+          sel.appendChild(opt);
+        });
+      }
 
-  g('statGrid').innerHTML = OPS.map(function(op) {
-    return '<div class="stat-box"><div class="s-label">' + op + '</div><div class="s-num">' + counts[op] + '</div><div class="s-sub">' + (total > 0 ? Math.round(counts[op] / total * 100) : 0) + '% of total</div></div>';
-  }).join('') + '<div class="stat-box"><div class="s-label">TOTAL</div><div class="s-num">' + total + '</div><div class="s-sub">Successful operations</div></div>';
+      // ── Spinner ────────────────────────────────────────────
+      function spin(id, on) {
+        g(id).className = "spinner" + (on ? " show" : "");
+      }
 
-  var max = Math.max(1, Math.max.apply(null, OPS.map(function(op) { return counts[op]; })));
-  g('barChart').innerHTML = OPS.map(function(op) {
-    var pct = Math.round(counts[op] / max * 100);
-    return '<div class="bar-col"><div class="bar-num">' + counts[op] + '</div><div class="bar-track"><div class="bar-fill" style="height:' + pct + '%"></div></div><div class="bar-name">' + op + '</div></div>';
-  }).join('');
-}
+      // ── Result helpers ─────────────────────────────────────
+      function errCard(msg) {
+        return (
+          '<div class="result-error"><strong>Error:</strong> ' +
+          esc(msg) +
+          "</div>"
+        );
+      }
 
-// ── Toast ──────────────────────────────────────────────
-function toast(msg) {
-  var el = document.createElement('div');
-  el.className = 'toast-n';
-  el.textContent = msg;
-  g('toasts').appendChild(el);
-  setTimeout(function() { el.remove(); }, 3000);
-}
+      function metaRow(items) {
+        var html = '<div class="result-meta">';
+        items.forEach(function (it) {
+          html +=
+            '<div class="meta-box"><div class="mk">' +
+            esc(it[0]) +
+            '</div><div class="mv">' +
+            esc(String(it[1])) +
+            "</div></div>";
+        });
+        return html + "</div>";
+      }
 
-// ── Utils ──────────────────────────────────────────────
-function g(id)  { return document.getElementById(id); }
-function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-function fmt(v) { return v != null ? +parseFloat(v).toFixed(6) : '—'; }
-</script>
-</body>
+      function renderCompare(d) {
+        if (d.error) return errCard(d.errorMessage || "Unknown error");
+        var isEq = d.resultString === "true";
+        return (
+          '<div class="result-success">' +
+          '<div class="result-label">Comparison Result</div>' +
+          '<div class="result-value">' +
+          (isEq ? "✓ EQUAL" : "✗ NOT EQUAL") +
+          "</div>" +
+          metaRow([
+            ["Qty A", d.thisValue + " " + d.thisUnit],
+            ["Qty B", d.thatValue + " " + d.thatUnit],
+            ["Type", d.thisMeasurementType || "—"],
+            ["Record #", d.id],
+          ]) +
+          "</div>"
+        );
+      }
+
+      function renderConvert(d) {
+        if (d.error) return errCard(d.errorMessage || "Unknown error");
+        return (
+          '<div class="result-success">' +
+          '<div class="result-label">Conversion Result</div>' +
+          '<div class="result-value">' +
+          fmt(d.resultValue) +
+          " " +
+          esc(d.resultUnit) +
+          "</div>" +
+          metaRow([
+            ["Original", d.thisValue + " " + d.thisUnit],
+            ["Converted", fmt(d.resultValue) + " " + d.resultUnit],
+            ["Type", d.thisMeasurementType || "—"],
+            ["Record #", d.id],
+          ]) +
+          "</div>"
+        );
+      }
+
+      function renderArithmetic(d, op) {
+        if (d.error) return errCard(d.errorMessage || "Unknown error");
+        var labels = {
+          add: "Addition",
+          subtract: "Subtraction",
+          divide: "Division",
+        };
+        return (
+          '<div class="result-success">' +
+          '<div class="result-label">' +
+          (labels[op] || op) +
+          " Result</div>" +
+          '<div class="result-value">' +
+          fmt(d.resultValue) +
+          " " +
+          esc(d.resultUnit || "") +
+          "</div>" +
+          metaRow([
+            ["Qty A", d.thisValue + " " + d.thisUnit],
+            ["Qty B", d.thatValue + " " + d.thatUnit],
+            ["Operation", labels[op] || op],
+            ["Record #", d.id],
+          ]) +
+          "</div>"
+        );
+      }
+
+      function setResult(id, html) {
+        g(id).innerHTML = html;
+      }
+
+      // ── Compare ────────────────────────────────────────────
+      async function doCompare() {
+        var v1 = g("c1val").value,
+          t1 = g("c1type").value,
+          u1 = g("c1unit").value;
+        var v2 = g("c2val").value,
+          t2 = g("c2type").value,
+          u2 = g("c2unit").value;
+        if (!v1 || !u1 || !v2 || !u2) {
+          toast("Please fill in all fields.");
+          return;
+        }
+        if (t1 !== t2) {
+          setResult(
+            "cmpResult",
+            errCard("Measurement types must match for comparison."),
+          );
+          toast("Please select the same measurement type for both quantities.");
+          return;
+        }
+        spin("cmpSpin", true);
+        var r = await api("/api/v1/quantities/compare", {
+          method: "POST",
+          body: JSON.stringify({
+            thisQuantityDTO: { value: +v1, unit: u1, measurementType: t1 },
+            thatQuantityDTO: { value: +v2, unit: u2, measurementType: t2 },
+          }),
+        });
+        spin("cmpSpin", false);
+        if (!r.ok || !r.data) {
+          setResult("cmpResult", errCard("Could not reach the server."));
+          return;
+        }
+        setResult("cmpResult", renderCompare(r.data));
+        if (!r.data.error) {
+          toast("Comparison complete!");
+          loadHistCount();
+        }
+      }
+
+      // ── Convert ────────────────────────────────────────────
+      async function doConvert() {
+        var type = g("cvtype").value,
+          from = g("cvfrom").value,
+          to = g("cvto").value,
+          val = g("cvval").value;
+        if (!type || !from || !to || !val) {
+          toast("Please fill in all fields.");
+          return;
+        }
+        spin("cvSpin", true);
+        var r = await api("/api/v1/quantities/convert", {
+          method: "POST",
+          body: JSON.stringify({
+            thisQuantityDTO: { value: +val, unit: from, measurementType: type },
+            thatQuantityDTO: { value: 0, unit: to, measurementType: type },
+          }),
+        });
+        spin("cvSpin", false);
+        if (!r.ok || !r.data) {
+          setResult("cvResult", errCard("Could not reach the server."));
+          return;
+        }
+        setResult("cvResult", renderConvert(r.data));
+        if (!r.data.error) {
+          toast("Conversion complete!");
+          loadHistCount();
+        }
+      }
+
+      // ── Arithmetic ─────────────────────────────────────────
+      function selOp(btn) {
+        document.querySelectorAll(".op-btn").forEach(function (b) {
+          b.classList.remove("active");
+        });
+        btn.classList.add("active");
+        currentOp = btn.dataset.op;
+      }
+
+      async function doArithmetic() {
+        var v1 = g("a1val").value,
+          t1 = g("a1type").value,
+          u1 = g("a1unit").value;
+        var v2 = g("a2val").value,
+          t2 = g("a2type").value,
+          u2 = g("a2unit").value;
+        if (!v1 || !u1 || !v2 || !u2) {
+          toast("Please fill in all fields.");
+          return;
+        }
+        if (t1 !== t2) {
+          setResult(
+            "arResult",
+            errCard("Measurement types must match for arithmetic operations."),
+          );
+          toast("Please select the same measurement type for both quantities.");
+          return;
+        }
+        spin("arSpin", true);
+        var r = await api("/api/v1/quantities/" + currentOp, {
+          method: "POST",
+          body: JSON.stringify({
+            thisQuantityDTO: { value: +v1, unit: u1, measurementType: t1 },
+            thatQuantityDTO: { value: +v2, unit: u2, measurementType: t2 },
+          }),
+        });
+        spin("arSpin", false);
+        if (!r.ok || !r.data) {
+          setResult("arResult", errCard("Could not reach the server."));
+          return;
+        }
+        setResult("arResult", renderArithmetic(r.data, currentOp));
+        if (!r.data.error) {
+          toast("Calculation complete!");
+          loadHistCount();
+        }
+      }
+
+      // ── Reset ──────────────────────────────────────────────
+      var RESETS = {
+        compare: {
+          inputs: ["c1val", "c2val"],
+          selects: ["c1type", "c1unit", "c2type", "c2unit"],
+          result: "cmpResult",
+          msg: "Fill both quantities and click Compare.",
+        },
+        convert: {
+          inputs: ["cvval"],
+          selects: ["cvtype", "cvfrom", "cvto"],
+          result: "cvResult",
+          msg: "Select type, units and enter a value to convert.",
+        },
+        arithmetic: {
+          inputs: ["a1val", "a2val"],
+          selects: ["a1type", "a1unit", "a2type", "a2unit"],
+          result: "arResult",
+          msg: "Select an operation, fill both quantities and click Calculate.",
+        },
+      };
+
+      function resetPage(name) {
+        var cfg = RESETS[name];
+        if (!cfg) return;
+        cfg.inputs.forEach(function (id) {
+          if (g(id)) g(id).value = "";
+        });
+        cfg.selects.forEach(function (id) {
+          if (g(id)) g(id).innerHTML = '<option value="">Select…</option>';
+        });
+        g(cfg.result).innerHTML = '<p class="result-empty">' + cfg.msg + "</p>";
+      }
+
+      // ── History ────────────────────────────────────────────
+      async function loadHistory() {
+        var op = g("histFilter").value;
+        var path = op
+          ? "/api/v1/quantities/history/" + op
+          : "/api/v1/quantities/history";
+        spin("histSpin", true);
+        var r = await api(path);
+        spin("histSpin", false);
+        if (!r.ok || !Array.isArray(r.data)) {
+          toast("Failed to load history.");
+          return;
+        }
+        g("histCount").textContent = r.data.length;
+        var body = g("histBody");
+        if (!r.data.length) {
+          body.innerHTML =
+            '<tr><td colspan="7" style="padding:20px;color:#888;text-align:center">No records found</td></tr>';
+          return;
+        }
+        body.innerHTML = r.data
+          .map(function (row) {
+            var qA =
+              row.thisValue != null
+                ? row.thisValue + " " + (row.thisUnit || "")
+                : "—";
+            var qB =
+              row.thatValue != null
+                ? row.thatValue + " " + (row.thatUnit || "")
+                : "—";
+            var res, status;
+            if (row.error) {
+              res =
+                '<span style="color:#c00">' +
+                esc(row.errorMessage || "Error") +
+                "</span>";
+              status = '<span style="color:#c00">Error</span>';
+            } else if (row.operation === "COMPARE") {
+              var eq = row.resultString === "true";
+              res =
+                '<strong style="color:' +
+                (eq ? "green" : "red") +
+                '">' +
+                (eq ? "Equal" : "Not Equal") +
+                "</strong>";
+              status = '<span style="color:green">OK</span>';
+            } else {
+              res =
+                "<strong>" +
+                fmt(row.resultValue) +
+                " " +
+                esc(row.resultUnit || "") +
+                "</strong>";
+              status = '<span style="color:green">OK</span>';
+            }
+            var ts = row.createdAt
+              ? new Date(row.createdAt).toLocaleString()
+              : "—";
+            return (
+              "<tr><td>" +
+              esc(String(row.id)) +
+              "</td><td>" +
+              esc(row.operation || "—") +
+              "</td><td>" +
+              esc(qA) +
+              "</td><td>" +
+              esc(qB) +
+              "</td><td>" +
+              res +
+              "</td><td>" +
+              status +
+              "</td><td>" +
+              ts +
+              "</td></tr>"
+            );
+          })
+          .join("");
+      }
+
+      async function loadHistCount() {
+        var r = await api("/api/v1/quantities/history");
+        if (r.ok && Array.isArray(r.data))
+          g("histCount").textContent = r.data.length;
+      }
+
+      // ── Stats ──────────────────────────────────────────────
+      async function loadStats() {
+        spin("statSpin", true);
+        var results = await Promise.all(
+          OPS.map(function (op) {
+            return api("/api/v1/quantities/count/" + op);
+          }),
+        );
+        spin("statSpin", false);
+        var counts = {};
+        OPS.forEach(function (op, i) {
+          counts[op] = results[i].ok ? results[i].data || 0 : 0;
+        });
+        var total = OPS.reduce(function (s, op) {
+          return s + counts[op];
+        }, 0);
+
+        g("statGrid").innerHTML =
+          OPS.map(function (op) {
+            return (
+              '<div class="stat-box"><div class="s-label">' +
+              op +
+              '</div><div class="s-num">' +
+              counts[op] +
+              '</div><div class="s-sub">' +
+              (total > 0 ? Math.round((counts[op] / total) * 100) : 0) +
+              "% of total</div></div>"
+            );
+          }).join("") +
+          '<div class="stat-box"><div class="s-label">TOTAL</div><div class="s-num">' +
+          total +
+          '</div><div class="s-sub">Successful operations</div></div>';
+
+        var max = Math.max(
+          1,
+          Math.max.apply(
+            null,
+            OPS.map(function (op) {
+              return counts[op];
+            }),
+          ),
+        );
+        g("barChart").innerHTML = OPS.map(function (op) {
+          var pct = Math.round((counts[op] / max) * 100);
+          return (
+            '<div class="bar-col"><div class="bar-num">' +
+            counts[op] +
+            '</div><div class="bar-track"><div class="bar-fill" style="height:' +
+            pct +
+            '%"></div></div><div class="bar-name">' +
+            op +
+            "</div></div>"
+          );
+        }).join("");
+      }
+
+      // ── Toast ──────────────────────────────────────────────
+      function toast(msg) {
+        var el = document.createElement("div");
+        el.className = "toast-n";
+        el.textContent = msg;
+        g("toasts").appendChild(el);
+        setTimeout(function () {
+          el.remove();
+        }, 3000);
+      }
+
+      // ── Utils ──────────────────────────────────────────────
+      function g(id) {
+        return document.getElementById(id);
+      }
+      function esc(s) {
+        return String(s)
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;");
+      }
+      function fmt(v) {
+        return v != null ? +parseFloat(v).toFixed(6) : "—";
+      }
+    </script>
+  </body>
 </html>

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>OAuth2 Callback</title>
+</head>
+<body>
+	<script>
+		const token = new URLSearchParams(window.location.search).get("token");
+		if (token) {
+			localStorage.setItem("qm_jwt", token);
+			// Parse the JWT to get the email
+			try {
+				const base64Url = token.split(".")[1];
+				const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+				const jsonPayload = decodeURIComponent(
+					atob(base64)
+						.split("")
+						.map(c => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
+						.join("")
+				);
+				const decoded = JSON.parse(jsonPayload);
+				const email = decoded.sub || "";
+				if (email) {
+					localStorage.setItem("qm_email", email);
+				}
+			} catch (e) {
+				console.error("Failed to parse JWT:", e);
+			}
+			window.location.href = "/index.html";
+		} else {
+			document.body.innerText = "Login failed.";
+		}
+	</script>
+</body>
+</html>

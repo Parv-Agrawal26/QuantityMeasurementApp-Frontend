@@ -533,77 +533,10 @@
       }
 
       function oauthLogin() {
-        var redirectUri = window.location.origin + window.location.pathname;
-
-        // Set to your backend OAuth entrypoint.
-        var oauthPath = "/oauth2/authorization/google";
-
-        // If you have a custom entrypoint, switch this:
-        // oauthPath = "/api/v1/auth/oauth/google";
-
-        var url = getBase() + oauthPath + "?redirect_uri=" + encodeURIComponent(redirectUri);
-
-        var popup = window.open(url, "oauthPopup", "width=600,height=700");
-        if (!popup) {
-          showAuthErr("Popup blocked. Please allow popups for this site.");
-          return;
-        }
-
-        var poll = window.setInterval(async function () {
-          if (popup.closed) {
-            window.clearInterval(poll);
-            showAuthErr("OAuth popup was closed before sign-in completed.");
-            return;
-          }
-
-          try {
-            // If same-origin path reached and backend returned JSON token body
-            var bodyText = (popup.document.body && popup.document.body.textContent) || "";
-            var trimmed = bodyText.trim();
-
-            if (trimmed.startsWith("{")) {
-              var tokenJson = JSON.parse(trimmed);
-              if (tokenJson.token) {
-                window.clearInterval(poll);
-                popup.close();
-
-                var token = tokenJson.token;
-                var email = tokenJson.email || (parseJwt(token).sub || "");
-
-                if (!email) {
-                  showAuthErr("OAuth token received, but email is missing.");
-                  return;
-                }
-
-                TOKEN = token;
-                EMAIL = email;
-                localStorage.setItem("qm_jwt", TOKEN);
-                localStorage.setItem("qm_email", EMAIL);
-                toast("OAuth login successful, welcome " + EMAIL + "!");
-                enterApp();
-                return;
-              }
-            }
-
-            // If callback with code from backend to frontend
-            var currentUrl = popup.location.href;
-            var callbackParams = new URLSearchParams(new URL(currentUrl).search);
-            if (callbackParams.has("token") && callbackParams.has("email")) {
-              window.clearInterval(poll);
-              popup.close();
-
-              TOKEN = callbackParams.get("token");
-              EMAIL = callbackParams.get("email");
-              localStorage.setItem("qm_jwt", TOKEN);
-              localStorage.setItem("qm_email", EMAIL);
-              toast("OAuth login successful, welcome " + EMAIL + "!");
-              enterApp();
-              return;
-            }
-          } catch (e) {
-            // Cross-origin navigation occurs before final callback; ignore security exceptions.
-          }
-        }, 500);
+        // Redirect to backend OAuth2 endpoint
+        // Backend will handle Google OAuth, then redirect back to oauth2-callback.html with token
+        var url = getBase() + "/oauth2/authorization/google";
+        window.location.href = url;
       }
 
       function parseJwt(token) {

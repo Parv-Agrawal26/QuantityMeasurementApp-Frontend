@@ -51,7 +51,7 @@ export default function AppLayout() {
       {/* ── Sidebar ── */}
       <nav className={`sidebar ${sidebarOpen ? 'open' : ''}`}>
         <div className="sidebar-brand">
-          <i className="bi bi-rulers me-2" />⚖️ QM App
+          ⚖️ QM App
         </div>
 
         <div className="mt-2">
@@ -132,18 +132,6 @@ export default function AppLayout() {
               <i className="bi bi-list" />
             </button>
             <span className="topbar-title" id="topbar-page-title">Quantity Measurement</span>
-          </div>
-          <div className="d-flex align-items-center gap-2">
-            <span className="text-muted d-none d-sm-inline" style={{ fontSize: '0.8rem' }}>
-              <i className="bi bi-hdd-network me-1" />Server:
-            </span>
-            <input
-              type="text"
-              className="form-control form-control-sm server-url-input d-none d-sm-block"
-              value={serverUrl}
-              onChange={handleServerChange}
-              placeholder="http://localhost:8080"
-            />
           </div>
         </header>
 

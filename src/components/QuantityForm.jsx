@@ -1,11 +1,6 @@
 import React from 'react'
 import { UNITS } from '../services/constants'
 
-/**
- * Reusable quantity input group.
- * Props: label, value, measurementType, unit, types, onChange
- *   onChange({ value, measurementType, unit })
- */
 export default function QuantityForm({ label, value, measurementType, unit, types, onChange }) {
   const units = measurementType ? (UNITS[measurementType] || []) : []
 

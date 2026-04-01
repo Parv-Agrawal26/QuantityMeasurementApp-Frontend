@@ -10,10 +10,10 @@
     <div id="toasts"></div>
 
     <!-- ═══════════════ AUTH ═══════════════ -->
-    <div id="authScreen">
+    <div id="authScreen" style="display: none">
       <div class="auth-card">
         <h2>⚖️ Quantity Measurement</h2>
-        <p>Sign in to start measuring &amp; converting</p>
+        <p>Sign in to access History &amp; Statistics</p>
 
         <div class="auth-tabs">
           <button
@@ -54,6 +54,13 @@
           >
             Continue with Google
           </button>
+          <button
+            class="btn btn-secondary"
+            style="width: 100%; margin-top: 8px"
+            onclick="backToApp()"
+          >
+            ← Back to App
+          </button>
         </div>
 
         <!-- Register -->
@@ -77,6 +84,13 @@
           >
             Create Account
           </button>
+          <button
+            class="btn btn-secondary"
+            style="width: 100%; margin-top: 8px"
+            onclick="backToApp()"
+          >
+            ← Back to App
+          </button>
         </div>
       </div>
     </div>
@@ -93,15 +107,16 @@
         <button class="sb-link" onclick="goto('convert')">Convert</button>
         <button class="sb-link" onclick="goto('arithmetic')">Arithmetic</button>
 
-        <div class="sb-section">Data</div>
+        <div class="sb-section">Data <span style="font-size:10px;opacity:0.6">(login required!)</span></div>
         <button class="sb-link" onclick="goto('history')">
           History (<span id="histCount">0</span>)
         </button>
         <button class="sb-link" onclick="goto('stats')">Statistics</button>
 
         <div class="sb-user">
-          <strong id="sbEmail">User</strong>
-          <button class="sb-logout" onclick="doLogout()">Logout</button>
+          <strong id="sbEmail">Guest User</strong>
+          <button class="sb-logout" id="btnLogout" onclick="doLogout()" style="display: none">Logout</button>
+          <button class="sb-logout" id="btnSignIn" onclick="showLoginPrompt()">Sign In</button>
         </div>
       </nav>
 
@@ -477,7 +492,7 @@
       // ── Boot ───────────────────────────────────────────────
       window.onload = function () {
         processOAuthCallback();
-        if (TOKEN) enterApp();
+        enterApp();
       };
 
       async function processOAuthCallback() {
@@ -504,7 +519,6 @@
         }
 
         if (code) {
-          // Spring Security default callback returns ?code=... when user is redirected from Google
           try {
             var redirectUri = window.location.origin + window.location.pathname;
             var r = await api("/api/v1/auth/oauth/callback", {
@@ -533,8 +547,6 @@
       }
 
       function oauthLogin() {
-        // Redirect to backend OAuth2 endpoint
-        // Backend will handle Google OAuth, then redirect back to oauth2-callback.html with token
         var url = getBase() + "/oauth2/authorization/google";
         window.location.href = url;
       }
@@ -562,9 +574,28 @@
       function enterApp() {
         g("authScreen").style.display = "none";
         g("app").style.display = "flex";
-        g("sbEmail").textContent = EMAIL || "User";
+        g("sbEmail").textContent = EMAIL || "Not Signed In";
+        
+        g("btnLogout").style.display = TOKEN ? "" : "none";
+        g("btnSignIn").style.display = TOKEN ? "none" : "";
         goto("compare");
-        loadHistCount();
+        if (TOKEN) loadHistCount();
+      }
+
+      // ── Login prompt (for protected pages) ────────────────
+      function showLoginPrompt() {
+        g("app").style.display = "none";
+        g("authScreen").style.display = "";
+        authTab("login");
+        showAuthErr("Please sign in first to view History & Statistics.");
+      }
+
+      // Return to app without logging
+      function backToApp() {
+        g("authScreen").style.display = "none";
+        g("app").style.display = "flex";
+        g("authErr").textContent = "";
+        g("authErr").className = "auth-error";
       }
 
       // ── Auth UI ────────────────────────────────────────────
@@ -655,6 +686,12 @@
           localStorage.setItem("qm_email", EMAIL);
           toast("Welcome back, " + e + "!");
           enterApp();
+          // After login, navigate to the protected page user originally wanted
+          if (pendingPage) {
+            var page = pendingPage;
+            pendingPage = null;
+            goto(page);
+          }
         } else {
           showAuthErr(
             (r.data && r.data.message) || "Invalid email or password.",
@@ -668,12 +705,14 @@
         EMAIL = "";
         localStorage.removeItem("qm_jwt");
         localStorage.removeItem("qm_email");
-        g("app").style.display = "none";
-        g("authScreen").style.display = "";
+        g("sbEmail").textContent = "Guest";
+        g("btnLogout").style.display = "none";
+        g("btnSignIn").style.display = "";
+        g("histCount").textContent = "0";
         g("li-email").value = "";
         g("li-pass").value = "";
-        authTab("login");
-        toast("Logged out.");
+        goto("compare"); // redirect away from protected pages
+        toast("Logged out. You can still use operations without signing in.");
       }
 
       // ── Navigation ─────────────────────────────────────────
@@ -685,7 +724,16 @@
         stats: "Statistics",
       };
 
+      // Remembers which protected page the user tried to visit before login
+      var pendingPage = null;
+
       function goto(name) {
+        // History and Stats require authentication
+        if ((name === "history" || name === "stats") && !TOKEN) {
+          pendingPage = name; // remember where they wanted to go
+          showLoginPrompt();
+          return;
+        }
         document.querySelectorAll(".page").forEach(function (p) {
           p.classList.remove("active");
         });
@@ -847,7 +895,7 @@
         setResult("cmpResult", renderCompare(r.data));
         if (!r.data.error) {
           toast("Comparison complete!");
-          loadHistCount();
+          if (TOKEN) loadHistCount();
         }
       }
 
@@ -877,7 +925,7 @@
         setResult("cvResult", renderConvert(r.data));
         if (!r.data.error) {
           toast("Conversion complete!");
-          loadHistCount();
+          if (TOKEN) loadHistCount();
         }
       }
 
@@ -925,7 +973,7 @@
         setResult("arResult", renderArithmetic(r.data, currentOp));
         if (!r.data.error) {
           toast("Calculation complete!");
-          loadHistCount();
+          if (TOKEN) loadHistCount();
         }
       }
 
@@ -965,6 +1013,7 @@
 
       // ── History ────────────────────────────────────────────
       async function loadHistory() {
+        if (!TOKEN) return; 
         var op = g("histFilter").value;
         var path = op
           ? "/api/v1/quantities/history/" + op
@@ -1043,6 +1092,7 @@
       }
 
       async function loadHistCount() {
+        if (!TOKEN) return;
         var r = await api("/api/v1/quantities/history");
         if (r.ok && Array.isArray(r.data))
           g("histCount").textContent = r.data.length;
@@ -1050,6 +1100,7 @@
 
       // ── Stats ──────────────────────────────────────────────
       async function loadStats() {
+        if (!TOKEN) return;
         spin("statSpin", true);
         var results = await Promise.all(
           OPS.map(function (op) {

@@ -26,9 +26,14 @@
 			} catch (e) {
 				console.error("Failed to parse JWT:", e);
 			}
+			// Redirect back to the app — it will auto-detect the token and enter as logged-in user
 			window.location.href = "/index.html";
 		} else {
-			document.body.innerText = "Login failed.";
+			// No token — redirect back to app as guest (no auth wall)
+			document.body.innerText = "Login failed. Redirecting...";
+			setTimeout(function () {
+				window.location.href = "/index.html";
+			}, 2000);
 		}
 	</script>
 </body>

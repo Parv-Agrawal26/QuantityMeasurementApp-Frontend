@@ -1,112 +1,158 @@
 # ⚖️ Quantity Measurement — React Frontend
 
-A React + Bootstrap 5 frontend for the Quantity Measurement Spring Boot API.
+A modern React + Bootstrap 5 frontend for the Quantity Measurement Spring Boot API.
 
-## Tech Stack
+## 🚀 Overview
 
-| Library | Purpose |
-|---|---|
-| React 18 | UI framework |
-| React Router v6 | Client-side routing |
-| Axios | HTTP requests to backend API |
-| Bootstrap 5.3 | CSS framework & components |
-| Bootstrap Icons | Icon library |
-| React Toastify | Toast notifications |
-| Recharts | Statistics bar chart |
-| Vite | Dev server & build tool |
+This project provides:
 
-## Project Structure
+- Compare quantities across measurement types (e.g., length, weight, volume)
+- Convert values between units
+- Arithmetic operations on quantities: add, subtract, divide
+- History records (requires login)
+- Usage statistics with a bar chart (requires login)
+- Email/password authentication and Google OAuth2 login support
+- Safe navigation with route guards for private pages
+
+## 🧩 Tech Stack
+
+- React 18
+- React Router v6
+- Vite (fast dev server and build tool)
+- Axios (HTTP client)
+- Bootstrap 5 (+ Bootstrap Icons)
+- React Toastify
+- Recharts
+
+## 📁 Project Structure
 
 ```
 src/
-├── context/
-│   └── AuthContext.jsx       # Global auth state (token, email, login, logout)
-├── services/
-│   ├── api.js                # All Axios API calls (authAPI, quantityAPI, historyAPI)
-│   └── constants.js          # Units, measurement types, operation names/colors
 ├── components/
-│   ├── AppLayout.jsx         # Sidebar + topbar shell (wraps all pages)
-│   ├── QuantityForm.jsx      # Reusable quantity input (value + type + unit)
-│   ├── ResultCard.jsx        # Compare / Convert / Arithmetic result displays
-│   └── PageHeader.jsx        # Page title + subtitle header
+│   ├── AppLayout.jsx         # Main layout (sidebar + topbar + content outlet)
+│   ├── PageHeader.jsx        # Section title + subtitle
+│   ├── QuantityForm.jsx      # Shared quantity input UI (amount + type + unit)
+│   └── ResultCard.jsx        # Shows computed result
+├── context/
+│   └── AuthContext.jsx       # Stores auth state (token, user, login/logout)
 ├── pages/
-│   ├── AuthPage.jsx          # Login + Register + Google OAuth
-│   ├── OAuthCallback.jsx     # Handles OAuth redirect, extracts JWT
+│   ├── AuthPage.jsx          # Login/Register form + Google OAuth
+│   ├── OAuthCallback.jsx     # Handles OAuth redirect callback
 │   ├── ComparePage.jsx       # Compare two quantities
-│   ├── ConvertPage.jsx       # Unit conversion
-│   ├── ArithmeticPage.jsx    # Add / Subtract / Divide
-│   ├── HistoryPage.jsx       # Operation history table (auth required)
-│   └── StatsPage.jsx         # Statistics + bar chart (auth required)
-├── App.jsx                   # Route definitions + ProtectedRoute guard
-├── main.jsx                  # React entry point, imports Bootstrap CSS
-└── index.css                 # Custom styles (sidebar, cards, results, etc.)
+│   ├── ConvertPage.jsx       # Convert one quantity to another unit
+│   ├── ArithmeticPage.jsx    # Add/Subtract/Divide with two quantities
+│   ├── HistoryPage.jsx       # Past operations (protected)
+│   └── StatsPage.jsx         # Operation count chart (protected)
+├── services/
+│   ├── api.js                # Axios wrapper: authAPI, quantityAPI, historyAPI
+│   └── constants.js          # Units, measurement lists, colors, operation mapping
+├── App.jsx                   # App routes + protected route guard
+├── main.jsx                  # App bootstrap with ReactDOM
+└── index.css                 # Custom styles
 ```
 
-## Setup & Running
+## 🧭 Routing
+
+- `/auth`: login/register page
+- `/oauth2-callback`: receives OAuth2 token and sets auth state
+- `/compare`: public compare page
+- `/convert`: public convert page
+- `/arithmetic`: public arithmetic page
+- `/history`: protected history page (requires login)
+- `/stats`: protected stats page (requires login)
+- Any unknown route auto-redirects to `/compare`
+
+## 🔐 Authentication & Authorization
+
+- React context handles `isLoggedIn`, `token`, and `userEmail`.
+- Protected Route wrapper (`ProtectedRoute`) redirects unauthenticated users to `/auth?redirect=true`.
+- Login, register, logout endpoints:
+  - `POST /api/v1/auth/login`
+  - `POST /api/v1/auth/register`
+  - `POST /api/v1/auth/logout`
+
+## 🔌 API Endpoints
+
+### Quantities (open)
+- `POST /api/v1/quantities/compare`
+- `POST /api/v1/quantities/convert`
+- `POST /api/v1/quantities/add`
+- `POST /api/v1/quantities/subtract`
+- `POST /api/v1/quantities/divide`
+
+### History & Stats (protected)
+- `GET /api/v1/quantities/history`
+- `GET /api/v1/quantities/history/:operation`
+- `GET /api/v1/quantities/count/:operation`
+- aggregated count via repeated `GET /api/v1/quantities/count/:operation`
+
+### Base URL
+- default: `http://localhost:8080`
+- runtime override in topbar saved to `localStorage.qm_server`
+
+## 🛠️ Local Setup
 
 ### Prerequisites
-- Node.js 18+ and npm
-- Spring Boot backend running on `http://localhost:8080`
+- Node.js 18+ / npm
+- Backend running on `http://localhost:8080`
 
-### Install & Start
+### Install
 
 ```bash
-# Install dependencies
 npm install
+```
 
-# Start dev server (proxies /api and /oauth2 to localhost:8080)
+### Run (development)
+
+```bash
 npm run dev
 ```
 
-Open http://localhost:5173 in your browser.
+Open `http://localhost:5173`.
 
-### Build for Production
+### Build (production)
 
 ```bash
 npm run build
-# Output is in the dist/ folder
 ```
 
-## Auth Behaviour
+### Preview production build
 
-| Page | Auth Required |
-|---|---|
-| Compare | ❌ Public |
-| Convert | ❌ Public |
-| Arithmetic | ❌ Public |
-| History | ✅ Login required |
-| Statistics | ✅ Login required |
-
-Unauthenticated users clicking History or Statistics are redirected to `/auth`.
-After login they are automatically sent back to the page they requested.
-
-## Backend CORS
-
-The backend `SecurityConfig.java` must allow the Vite dev server origin.
-Add `http://localhost:5173` to the allowed origins:
-
-```java
-config.setAllowedOrigins(Arrays.asList(
-    "http://127.0.0.1:5500",
-    "http://localhost:5500",
-    "http://localhost:5173"   // ← add this
-));
+```bash
+npm run preview
 ```
 
-## OAuth2 Callback
+## 💡 CORS & OAuth Tips
 
-Configure Google OAuth2 in your Google Cloud Console with the redirect URI:
-```
-http://localhost:8080/login/oauth2/code/google
-```
+- Backend CORS must allow `http://localhost:5173`.
+- Google OAuth2 redirect URI should be configured as:
+  - `http://localhost:8080/login/oauth2/code/google`
+- Backend should redirect successful OAuth login to:
+  - `http://localhost:5173/oauth2-callback?token=<JWT>`
 
-The backend `OAuth2SuccessHandler` should redirect to:
-```
-http://localhost:5173/oauth2-callback?token=<JWT>
-```
+## 📘 UX details
 
-## Changing the Backend URL
+- Toasts appear top-right with 3-second auto-close.
+- Public pages: compare/convert/arithmetic.
+- Private pages: history/stats (guarded for valid JWT).
+- Unauthenticated attempt to private page redirects to `/auth` and then back to original page after login.
 
-The backend server URL can be changed at runtime via the input field in the
-top-right of the topbar. The value is saved to `localStorage` under `qm_server`.
-Default is `http://localhost:8080`.
+## 🧪 Testing pointers
+
+- Validate quantity conversion with known values (e.g., 1 meter = 100 cm).
+- Compare incompatible types should show error from backend.
+- Arithmetic operations should respect unit conversion rules.
+- History and stats should reflect performed operations after login.
+
+## 🧹 Code standards
+
+- `.jsx` components are functional and hook-based.
+- `services/api.js` centralizes backend calls and token injection.
+- `context/AuthContext.jsx` manages auth state and persistence in `localStorage`.
+
+## 📦 Dependencies
+
+- `react`, `react-dom`, `react-router-dom`, `axios`, `bootstrap`, `bootstrap-icons`, `react-toastify`, `recharts`
+- dev: `vite`, `@vitejs/plugin-react`, `@types/react`, `@types/react-dom`
+
+

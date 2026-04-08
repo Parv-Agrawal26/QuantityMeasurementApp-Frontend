@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 // Base URL — reads from localStorage so users can change it at runtime via the topbar
-const getBaseURL = () => localStorage.getItem('qm_server') || 'http://localhost:8080'
+const getBaseURL = () => localStorage.getItem('qm_server') || import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080'
 
 function createClient(token) {
   const client = axios.create({

@@ -60,7 +60,7 @@ export default function AuthPage() {
   }
 
   const handleGoogleLogin = () => {
-    const base = localStorage.getItem('qm_server') || 'http://localhost:8080'
+    const base = localStorage.getItem('qm_server') || 'https://qma-parv-production.up.railway.app'
     window.location.href = `${base}/oauth2/authorization/google`
   }
 

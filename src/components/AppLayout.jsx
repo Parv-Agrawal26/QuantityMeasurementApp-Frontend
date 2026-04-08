@@ -17,7 +17,7 @@ export default function AppLayout() {
   const navigate = useNavigate()
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [serverUrl, setServerUrl] = useState(
-    () => localStorage.getItem('qm_server') || 'http://localhost:8080'
+    () => localStorage.getItem('qm_server') || 'https://qma-parv-production.up.railway.app'
   )
 
   const handleServerChange = (e) => {

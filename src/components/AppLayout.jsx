@@ -4,41 +4,45 @@ import { useAuth } from '../context/AuthContext'
 import { authAPI } from '../services/api'
 import { toast } from 'react-toastify'
 
-const NAV_ITEMS = [
-  { to: '/compare',    label: 'Compare',    icon: 'bi-arrow-left-right', section: 'Operations' },
-  { to: '/convert',    label: 'Convert',    icon: 'bi-arrow-repeat',     section: null },
-  { to: '/arithmetic', label: 'Arithmetic', icon: 'bi-calculator',       section: null },
-  { to: '/history',    label: 'History',    icon: 'bi-clock-history',    section: 'Data', protected: true },
-  { to: '/stats',      label: 'Statistics', icon: 'bi-bar-chart-fill',   section: null,   protected: true },
+
+const NAV_GROUPS = [
+  {
+    section: 'Operations',
+    items: [
+      { to: '/compare', label: 'Compare', icon: 'bi-arrow-left-right' },
+      { to: '/convert', label: 'Convert', icon: 'bi-arrow-repeat' },
+      { to: '/arithmetic', label: 'Arithmetic', icon: 'bi-calculator' },
+    ]
+  },
+  {
+    section: 'Data',
+    protected: true,
+    items: [
+      { to: '/history', label: 'History', icon: 'bi-clock-history' },
+      { to: '/stats', label: 'Statistics', icon: 'bi-bar-chart-fill' },
+    ]
+  }
 ]
 
 export default function AppLayout() {
   const { token, email, logout, isLoggedIn } = useAuth()
   const navigate = useNavigate()
   const [sidebarOpen, setSidebarOpen] = useState(false)
-  const [serverUrl, setServerUrl] = useState(
-    () => localStorage.getItem('qm_server') || 'https://qma-parv-production.up.railway.app'
-  )
-
-  const handleServerChange = (e) => {
-    const val = e.target.value.replace(/\/$/, '')
-    setServerUrl(val)
-    localStorage.setItem('qm_server', val)
-  }
 
   const handleLogout = async () => {
     try {
       await authAPI.logout(token)
-    } catch (_) {}
+    } catch (err) {
+      console.error(err)
+    }
     logout()
     toast.info('Logged out successfully.')
     navigate('/compare')
   }
 
-  let lastSection = null
-
   return (
     <div className="app-wrapper">
+
       {/* Overlay for mobile */}
       {sidebarOpen && (
         <div
@@ -50,28 +54,26 @@ export default function AppLayout() {
 
       {/* ── Sidebar ── */}
       <nav className={`sidebar ${sidebarOpen ? 'open' : ''}`}>
-        <div className="sidebar-brand">
-          ⚖️ QM App
-        </div>
+        <div className="sidebar-brand">⚖️ QM App</div>
 
         <div className="mt-2">
-          {NAV_ITEMS.map((item) => {
-            const showSection = item.section && item.section !== lastSection
-            if (item.section) lastSection = item.section
-
-            return (
-              <React.Fragment key={item.to}>
-                {showSection && (
-                  <div className="sidebar-section d-flex align-items-center gap-1">
-                    {item.section}
-                    {item.protected && (
-                      <span className="ms-1" title="Login required">
-                        <i className="bi bi-lock-fill" style={{ fontSize: '0.65rem' }} />
-                      </span>
-                    )}
-                  </div>
+          {NAV_GROUPS.map((group) => (
+            <div key={group.section}>
+              
+              {/* Section Title */}
+              <div className="sidebar-section d-flex align-items-center gap-1">
+                {group.section}
+                {group.protected && (
+                  <span className="ms-1" title="Login required">
+                    <i className="bi bi-lock-fill" style={{ fontSize: '0.65rem' }} />
+                  </span>
                 )}
+              </div>
+
+              {/* Items */}
+              {group.items.map((item) => (
                 <NavLink
+                  key={item.to}
                   to={item.to}
                   className={({ isActive }) =>
                     `sidebar-link ${isActive ? 'active' : ''}`
@@ -81,9 +83,9 @@ export default function AppLayout() {
                   <i className={`bi ${item.icon}`} />
                   {item.label}
                 </NavLink>
-              </React.Fragment>
-            )
-          })}
+              ))}
+            </div>
+          ))}
         </div>
 
         {/* Sidebar footer */}
@@ -104,7 +106,7 @@ export default function AppLayout() {
             </>
           ) : (
             <>
-              <div className="sidebar-user-email text-muted">
+              <div className="sidebar-user-email">
                 <i className="bi bi-person-circle me-1" />
                 Guest
               </div>
@@ -122,7 +124,6 @@ export default function AppLayout() {
 
       {/* ── Main area ── */}
       <div className="main-area">
-        {/* Topbar */}
         <header className="topbar">
           <div className="d-flex align-items-center gap-3">
             <button
@@ -131,11 +132,12 @@ export default function AppLayout() {
             >
               <i className="bi bi-list" />
             </button>
-            <span className="topbar-title" id="topbar-page-title">Quantity Measurement</span>
+            <span className="topbar-title">
+              Quantity Measurement
+            </span>
           </div>
         </header>
 
-        {/* Page content */}
         <main className="page-content">
           <Outlet />
         </main>
